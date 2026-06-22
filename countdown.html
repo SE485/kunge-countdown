@@ -24,7 +24,7 @@
             position: relative;
         }
 
-        /* 浮动文字 */
+        /* 浮动文字 - 桌面版显示，移动版隐藏 */
         .floating-text {
             position: absolute;
             font-size: 14px;
@@ -48,8 +48,8 @@
             border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             border: 3px dashed rgba(255,107,107,0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
 
         /* 标题 */
@@ -290,21 +290,36 @@
 
         /* 响应式 */
         @media (max-width: 600px) {
+            .floating-text { display: none; }
+            .container { 
+                padding: 25px;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
             .title { font-size: 32px; }
             .time-number { font-size: 32px; }
             .countdown-display { gap: 10px; }
-            .time-box { padding: 15px; min-width: 60px; }
+            .time-box { padding: 12px; min-width: 55px; }
+            .settings { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+            .funny-tip { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+            .music-btn { 
+                width: 40px; 
+                height: 40px; 
+                font-size: 18px;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 背景音乐 -->
-    <audio id="bgMusic" loop>
+    <!-- 背景音乐（preload="none" 表示不预加载，等播放时再下载） -->
+    <audio id="bgMusic" loop preload="none">
         <source src="bgm.mp3" type="audio/mpeg">
     </audio>
 
     <!-- 倒计时结束提示音 -->
-    <audio id="alarmSound" loop>
+    <audio id="alarmSound" loop preload="none">
         <source src="alarm.mp3" type="audio/mpeg">
     </audio>
 
