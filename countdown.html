@@ -24,7 +24,7 @@
             position: relative;
         }
 
-        /* 搞笑浮动文字 */
+        /* 浮动文字 */
         .floating-text {
             position: absolute;
             font-size: 14px;
@@ -176,7 +176,7 @@
             transform: translateY(-3px);
         }
 
-        /* 搞笑提示 */
+        /* 提示 */
         .funny-tip {
             margin-top: 20px;
             padding: 15px;
@@ -270,6 +270,14 @@
             animation: pulse 1.5s ease-in-out infinite;
         }
 
+        .alarm-btn {
+            background: rgba(255,107,107,0.7);
+        }
+
+        .alarm-btn:hover {
+            background: rgba(255,107,107,0.9);
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.15); }
@@ -295,12 +303,22 @@
         <source src="bgm.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- 倒计时结束提示音 -->
+    <audio id="alarmSound" loop>
+        <source src="alarm.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- 音乐控制按钮 -->
     <button id="musicToggle" class="music-btn" onclick="toggleMusic()" title="点击播放/暂停音乐">
         🎵
     </button>
 
-    <!-- 浮动搞笑文字 -->
+    <!-- 提示音控制按钮 -->
+    <button id="alarmToggle" class="music-btn alarm-btn" onclick="toggleAlarm()" title="点击关闭提示音" style="top: 80px;">
+        🔔
+    </button>
+
+    <!-- 浮动文字 -->
     <div class="floating-text" style="top: 10%; left: 10%;">⏰ 时间紧迫！</div>
     <div class="floating-text" style="top: 20%; right: 15%; animation-delay: 0.5s;">😱 快要到了！</div>
     <div class="floating-text" style="bottom: 15%; left: 20%; animation-delay: 1s;">🤪 准备好了吗？</div>
@@ -308,7 +326,7 @@
 
     <div class="container">
         <h1 class="title">坤哥倒计时</h1>
-        <p class="subtitle"> <span class="emoji">😈</span></p>
+        <p class="subtitle"> <span class="emoji">🎉</span></p>
 
         <!-- 设置区域 -->
         <div class="settings" id="settings">
@@ -376,7 +394,7 @@
                 <span class="emoji">🎆</span>
             </p>
             <p id="completedMessage" style="font-size: 18px; color: #666; margin: 20px 0;"></p>
-            <button class="btn btn-primary" onclick="resetCountdown()">再来一次！</button>
+            <button class="btn btn-primary" onclick="resetCountdown()">再设一个！</button>
         </div>
     </div>
 
@@ -387,24 +405,24 @@
         let startDate;
 
         const funnyTips = [
-            "💡 提示：倒计时期间请保持严肃！（才怪）",
+            "💡 提示：倒计时期间请保持专注！",
             "🤔 猜猜时间到了会发生什么？",
             "😎 淡定点，还有时间刷个视频",
             "🙈 不敢看！不敢看！",
             "🤪 准备好迎接惊喜了吗？",
             "😱 时间正在飞速流逝！",
-            "🎵 建议播放《鸡你太美》缓解紧张",
+            "🎵 建议播放音乐缓解紧张",
             "🤣 友情提示：记得截图发朋友圈",
-            "😈 坤哥正在赶来的路上...",
-            "🎪 这是一场精心策划的恶作剧！"
+            "🎉 坤哥正在赶来的路上...",
+            "🎪 这是一场精心策划的惊喜！"
         ];
 
         const completedMessages = [
             "坤哥已经出现！请做好心理准备！",
-            "时间到！你的好友正在偷笑！",
-            "恭喜你！成功被恶搞了！",
+            "时间到！精彩时刻到了！",
+            "恭喜你！倒计时圆满完成！",
             "惊不惊喜？意不意外？",
-            "这是一场有预谋的倒计时！",
+            "这是一场精心策划的倒计时！",
             "坤哥说：你已经被我锁定了！"
         ];
 
@@ -486,8 +504,58 @@
             const message = completedMessages[Math.floor(Math.random() * completedMessages.length)];
             document.getElementById('completedMessage').textContent = message;
 
-            // 播放完成音效（如果浏览器支持）
-            playCompletionSound();
+            // 暂停背景音乐，播放提示音
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.pause();
+            const musicBtn = document.getElementById('musicToggle');
+            musicBtn.classList.remove('playing');
+            musicBtn.title = '点击播放音乐';
+            
+            // 播放循环提示音
+            playAlarmSound();
+        }
+
+        // 播放循环提示音
+        function playAlarmSound() {
+            const alarmSound = document.getElementById('alarmSound');
+            const alarmBtn = document.getElementById('alarmToggle');
+            alarmSound.volume = 0.8;
+            alarmSound.play().then(() => {
+                alarmBtn.classList.add('playing');
+                alarmBtn.title = '点击关闭提示音';
+            }).catch(e => {
+                console.log('提示音播放失败:', e);
+            });
+        }
+
+        // 关闭提示音
+        function stopAlarmSound() {
+            const alarmSound = document.getElementById('alarmSound');
+            const alarmBtn = document.getElementById('alarmToggle');
+            alarmSound.pause();
+            alarmSound.currentTime = 0;
+            alarmBtn.classList.remove('playing');
+            alarmBtn.title = '提示音已关闭';
+            
+            // 恢复背景音乐
+            const bgMusic = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicToggle');
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    musicBtn.classList.add('playing');
+                    musicBtn.title = '点击暂停音乐';
+                }).catch(e => {
+                    console.log('背景音乐恢复失败:', e);
+                });
+            }
+        }
+
+        // 切换提示音
+        function toggleAlarm() {
+            const alarmSound = document.getElementById('alarmSound');
+            if (!alarmSound.paused) {
+                stopAlarmSound();
+            }
         }
 
         // 停止倒计时
@@ -499,35 +567,32 @@
         // 重置倒计时
         function resetCountdown() {
             clearInterval(countdownInterval);
+            
+            // 停止提示音
+            const alarmSound = document.getElementById('alarmSound');
+            const alarmBtn = document.getElementById('alarmToggle');
+            alarmSound.pause();
+            alarmSound.currentTime = 0;
+            alarmBtn.classList.remove('playing');
+            alarmBtn.title = '提示音已关闭';
+            
+            // 恢复背景音乐
+            const bgMusic = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicToggle');
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    musicBtn.classList.add('playing');
+                    musicBtn.title = '点击暂停音乐';
+                }).catch(e => {
+                    console.log('背景音乐恢复失败:', e);
+                });
+            }
+            
             document.getElementById('settings').classList.remove('hidden');
             document.getElementById('countdownArea').classList.add('hidden');
             document.getElementById('completedArea').classList.add('hidden');
             document.getElementById('targetTime').value = '';
             document.getElementById('countdownTitle').value = '';
-        }
-
-        // 播放完成音效
-        function playCompletionSound() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (e) {
-                console.log('音效播放失败:', e);
-            }
         }
 
         // 音乐播放控制
